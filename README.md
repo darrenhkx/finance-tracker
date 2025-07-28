@@ -21,3 +21,9 @@ User
 To be added in the future:
 - AI recommendations/budgetting advice
 - exporting to pdf/csv
+
+## License
+
+This project is licensed under the MIT License.  
+You're free to use, modify, and distribute it — just credit **Darren Huam**.  
+See the [LICENSE](./LICENSE) file for details.
