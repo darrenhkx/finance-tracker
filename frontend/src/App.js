@@ -19,6 +19,7 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<UserHome />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/navbar" element={<NavBar />/*test*/} /> 
       </Routes>
     </Router>
   );
