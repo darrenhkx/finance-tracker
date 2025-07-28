@@ -5,6 +5,7 @@
 - DB: to be decided, likely some kind of cloud postgresql
 
 Features to be implemented for now:
+
 Admin
 - Login/Logout
 - Manage users
