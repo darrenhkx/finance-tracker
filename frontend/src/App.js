@@ -9,6 +9,8 @@ import UserProfile from "./pages/UserProfile/UserProfile.jsx";
 
 // Components
 import NavBar from "./components/NavBar/NavBar.jsx";
+import Card from "./components/Card/Card.jsx";
+import ExpenseBreakDown from "./components/ExpenseBreakdown/ExpenseBreakdown.jsx";
 
 const App = () => {
   return (
@@ -19,7 +21,6 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<UserHome />} />
         <Route path="/profile" element={<UserProfile />} />
-        <Route path="/navbar" element={<NavBar />/*test*/} /> 
       </Routes>
     </Router>
   );

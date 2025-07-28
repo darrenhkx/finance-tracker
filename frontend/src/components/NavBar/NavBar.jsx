@@ -1,5 +1,5 @@
 import React from "react";
-import "./NavBar.css"; // make sure to create this file too
+import "./NavBar.css";
 import logo from "../../assets/logo.png";
 import { useNavigate } from 'react-router-dom';
 
