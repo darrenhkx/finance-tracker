@@ -1,8 +1,8 @@
-Budgeting webapp mini project
+**Budgeting webapp mini project**
 
-Frontend: React.js
-Backend: Python
-DB: to be decided, likely some kind of cloud postgresql
+- Frontend: React.js
+- Backend: Python
+- DB: to be decided, likely some kind of cloud postgresql
 
 Features to be implemented for now:
 Admin
