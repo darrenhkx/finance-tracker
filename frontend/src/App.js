@@ -6,11 +6,7 @@ import UserHome from "./pages/UserHome/UserHome.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.jsx";
 import UserProfile from "./pages/UserProfile/UserProfile.jsx";
-
-// Components
-import NavBar from "./components/NavBar/NavBar.jsx";
-import Card from "./components/Card/Card.jsx";
-import ExpenseBreakDown from "./components/ExpenseBreakdown/ExpenseBreakdown.jsx";
+import ManageBudget from "./pages/ManageBudget/ManageBudget.jsx";
 
 const App = () => {
   return (
@@ -21,6 +17,7 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<UserHome />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/manage-budget" element={<ManageBudget />} />
       </Routes>
     </Router>
   );
