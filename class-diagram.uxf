@@ -5,15 +5,17 @@
     <id>UMLClass</id>
     <coordinates>
       <x>720</x>
-      <y>220</y>
-      <w>130</w>
-      <h>80</h>
+      <y>190</y>
+      <w>110</w>
+      <h>110</h>
     </coordinates>
-    <panel_attributes>Accounts
+    <panel_attributes>Users
 -
-username         ID1
+id                 ID1
 email
-password</panel_attributes>
+password
+user_type
+created_at</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -86,16 +88,16 @@ password</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>840</x>
+      <x>820</x>
       <y>270</y>
-      <w>140</w>
+      <w>150</w>
       <h>110</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1..*
 m2=0..*
 &lt; manages</panel_attributes>
-    <additional_attributes>90.0;90.0;90.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>110.0;90.0;110.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -115,45 +117,52 @@ updates &gt;</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>700</x>
-      <y>450</y>
+      <y>440</y>
       <w>100</w>
-      <h>80</h>
+      <h>140</h>
     </coordinates>
     <panel_attributes>Expenses
 -
 id               ID1
+user_id       FK
 name
-amount</panel_attributes>
+category
+amount
+date
+created_at</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>600</x>
-      <y>540</y>
+      <x>590</x>
+      <y>560</y>
       <w>100</w>
-      <h>80</h>
+      <h>130</h>
     </coordinates>
     <panel_attributes>Income
 -
 id               ID1
+user_id       FK
+amount
 name
-amount</panel_attributes>
+received_at
+created_at</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>640</x>
+      <x>630</x>
       <y>380</y>
       <w>70</w>
-      <h>180</h>
+      <h>200</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
 m2=0..*
 has v</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;160.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;180.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -161,13 +170,13 @@ has v</panel_attributes>
       <x>700</x>
       <y>360</y>
       <w>110</w>
-      <h>110</h>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
 m2=0..*
 has v</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;10.0;50.0;90.0</additional_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;80.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
@@ -175,16 +184,15 @@ has v</panel_attributes>
       <x>420</x>
       <y>430</y>
       <w>150</w>
-      <h>130</h>
+      <h>110</h>
     </coordinates>
     <panel_attributes>Budget
 -
 id                            ID1
 user_id                   FK
-name      
-total_amount
-start_date
-end_date</panel_attributes>
+name   
+amount
+created_at</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
