@@ -12,7 +12,7 @@ Admin
   
 User
 - Login/Logout✔️
-- Register with email confirmation✔
+- Register with email confirmation
 - Manage account
 - Manage budget, income, expenses
 - History
