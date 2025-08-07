@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.jsx";
 import UserProfile from "./pages/UserProfile/UserProfile.jsx";
 import ManageBudget from "./pages/ManageBudget/ManageBudget.jsx";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
 
 const App = () => {
   return (
@@ -15,7 +16,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/home" element={<UserHome />} />
+        <Route path="/home" element={ <ProtectedRoute><UserHome /></ProtectedRoute>} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/manage-budget" element={<ManageBudget />} />
       </Routes>

@@ -6,6 +6,12 @@ import { useNavigate } from 'react-router-dom';
 const NavBar = () => {
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  };
+
   return (
     <div className="nav-bar">
       <img src={logo} alt="logo" className="navbar-logo"/>
@@ -13,7 +19,7 @@ const NavBar = () => {
         <p onClick={() => navigate('/home')} className="nav-link">Home</p>
         <p onClick={() => navigate('/manage-budget')} className="nav-link">Manage Budget</p>
         <p onClick={() => navigate('/manage-account')} className="nav-link">Manage Account</p>
-        <p onClick={() => navigate('/logout')} className="nav-link">Log Out</p>
+        <p onClick={handleLogout} className="nav-link">Log Out</p>
       </div>
     </div>
   );

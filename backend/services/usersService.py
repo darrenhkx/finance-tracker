@@ -9,7 +9,7 @@ def create_user(db: Session, user_in: UserCreate):
         id=uuid.uuid4(),
         email=user_in.email,
         password=user_in.password,  # ideally hash before saving
-        created_at=datetime.utcnow()
+        created_at=datetime.now(datetime.UTC)()
     )
     db.add(new_user)
     db.commit()

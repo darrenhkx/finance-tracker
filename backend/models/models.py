@@ -11,12 +11,6 @@ class UserRole(enum.Enum):
     user = "user"
     admin = "admin"
 
-class CategoryType(enum.Enum):
-    budget = "budget"
-    expense = "expense"
-    both = "both"
-
-
 class User(Base):
     __tablename__ = "users"
 
@@ -35,14 +29,10 @@ class User(Base):
 
 class Category(Base):
     __tablename__ = "categories"
-    __table_args__ = (
-        UniqueConstraint('user_id', 'name', 'type', name='uq_user_category_name_type'),
-    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"))
     name = Column(String, nullable=False)
-    type = Column(Enum(CategoryType), nullable=False, default=CategoryType.both)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="categories")

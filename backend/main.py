@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import usersRouter
+from routers import usersRouter, incomeRouter, expenseRouter, categoryRouter
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -17,6 +17,9 @@ app.add_middleware(
 )
 
 app.include_router(usersRouter.router)
+app.include_router(incomeRouter.router)
+app.include_router(expenseRouter.router)
+app.include_router(categoryRouter.router)
 
 @app.get("/")
 def root():

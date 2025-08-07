@@ -27,8 +27,15 @@ const LoginPage = () => {
       }
 
       const data = await response.json();
+      console.log("Received login data:", data);
+      localStorage.setItem("token", data.access_token); // store JWT
+      localStorage.setItem("user", JSON.stringify({
+        email: data.email,
+        user_id: data.user_id
+      }));
       setMessage(`Login successful! Welcome ${data.email}`);
-      setTimeout(() => navigate("/home"), 1000);
+      console.log("Received login data:", data);
+      navigate("/home");
     } catch (err) {
       console.error(err);
       setMessage("Error connecting to server");
