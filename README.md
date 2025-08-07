@@ -1,20 +1,20 @@
-**Budgeting webapp mini project**
+**Budgeting webapp project**
 
 - Frontend: React.js
 - Backend: Python
-- DB: to be decided, likely some kind of cloud postgresql
+- DB: Supabase postgresql
 
-Features to be implemented for now:
+Features to be implemented for now(ticked are done):
 
 Admin
 - Login/Logout
 - Manage users
   
 User
-- Login/Logout
+- Login/Logout✔️
 - Register with email confirmation
 - Manage account
-- Manage budget
+- Manage budget, income, expenses
 - History
 - Visualiser graphs for account outlook
 
