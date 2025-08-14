@@ -19,7 +19,8 @@ class User(Base):
     password = Column(String, nullable=False)
     user_type = Column(Enum(UserRole), nullable=False, default=UserRole.user)
     created_at = Column(DateTime, default=datetime.utcnow)
-
+    goals = Column(Numeric, nullable=False)
+    
     # relationships
     categories = relationship("Category", back_populates="user", cascade="all, delete")
     budgets = relationship("Budget", back_populates="user", cascade="all, delete")

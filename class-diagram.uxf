@@ -5,9 +5,9 @@
     <id>UMLClass</id>
     <coordinates>
       <x>720</x>
-      <y>190</y>
+      <y>170</y>
       <w>110</w>
-      <h>110</h>
+      <h>130</h>
     </coordinates>
     <panel_attributes>users
 -
@@ -15,7 +15,8 @@ id                 ID1
 email
 password
 user_type
-created_at</panel_attributes>
+created_at
+goals</panel_attributes>
     <additional_attributes/>
   </element>
   <element>

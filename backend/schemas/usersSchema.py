@@ -23,3 +23,7 @@ class UserOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+class UserGoalOut(BaseModel):
+    id: str
+    goals : float

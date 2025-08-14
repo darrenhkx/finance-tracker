@@ -21,3 +21,11 @@ def login_user(db: Session, email: str, password: str):
     if not db_user or db_user.password != password:
         return None
     return db_user
+
+def get_goal(db: Session, user_id: uuid.UUID) -> float:
+    goal= (
+        db.query(User)
+        .filter(User.id == user_id)
+        .first()
+    )
+    return float(goal.goals) if goal else 0.00

@@ -19,6 +19,12 @@ const UserHome = () => {
   //const month = today.getMonth()+1; its august now and my data is july so i use hardcoded month for now
   const month = 7;
   const year = today.getFullYear();
+  const [savingsGoal, setSavingsGoal] = useState(0);
+  const totalBudget = income - savingsGoal;
+  const [budgets, setBudgets] = useState([]);
+  const savings = income-totalExpenses;
+  const savingsPercentage = (savings/income*100).toFixed(1);
+  const options = ["Overview", "Transactions", "History"];
 
   useEffect(() => {
     const fetchIncome = async () => {
@@ -113,33 +119,81 @@ const UserHome = () => {
     if (user_id && token) fetchExpenses();
   }, [categories, user_id, token]);
 
-  const savings = income-totalExpenses;
-  const budget = 80/100 * income; 
-  const savingsPercentage = (savings/income*100).toFixed(1);
-  const options = ["Overview", "Transactions", "History"];
+  useEffect(() => {
+    const fetchBudgets = async () => {
+      if (!categories.length) return;
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/budget/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        if (!response.ok) throw new Error("Failed to fetch list of budgets");
 
-  const monthlyData = [
-    { month: "Jun'25", budget: budget, expenses: totalExpenses },
-    { month: "Jul'25", budget: budget, expenses: totalExpenses },
-  ];
+        const data = await response.json();
 
-  const budgets = [
-    { name: "Food", budget: 500 },
-    { name: "Transport", budget: 400 },
-    { name: "Utilities", budget: 350 },
-    { name: "Entertainment", budget: 200 },
-    { name: "Others", budget: 630 },
+        // Convert into (name, value) pairs
+        const categoryTotals = {};
+        data.forEach((budget) => {
+          const category = categories.find((cat) => cat.id === budget.category_id)?.name || "Others";
+          const amount = budget.amount;
+          if (!categoryTotals[category]) {
+            categoryTotals[category] = 0;
+          }
+          categoryTotals[category] += amount;
+        });
+
+        const formattedData = Object.entries(categoryTotals).map(([name, value]) => ({
+          name,
+          value,
+        }));
+        
+        setBudgets(formattedData);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load budgets");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user_id && token) fetchBudgets();
+  }, [categories, user_id, token]);
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/users/goals`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        if (!response.ok) throw new Error("Failed to fetch goal");
+        
+        const data = await response.json();
+        setSavingsGoal(data.goal);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load goal");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user_id && token) fetchGoals();
+  }, [user_id, token]);
+
+  const monthlyData = [ // hardcoded. to be removed.
+    { month: "Jun'25", budget: totalBudget, expenses: totalExpenses },
+    { month: "Jul'25", budget: totalBudget, expenses: totalExpenses },
   ];
 
   const mergedBudgets = (() => {
       const matched = [];
-      let othersSpent = 0;
 
       budgets.forEach(b => {
         const expense = expenses.find(e => e.name === b.name);
         matched.push({
           name: b.name,
-          budget: b.budget,
+          budget: b.value,
           spent: expense ? expense.value : 0,
         });
       });
@@ -160,8 +214,8 @@ const UserHome = () => {
         <div className="cards-container">
           <Card name="Total Income" amount={income}/>
           <Card name="Total Expenses" amount={totalExpenses}/>
-          <Card name="Available" amount={budget-totalExpenses}/>
-          <Card name="Total Budget" amount={budget}/>
+          <Card name="Available" amount={totalBudget-totalExpenses}/>
+          <Card name="Total Budget" amount={totalBudget}/>
         </div>
         <div className="view-selector-bar">
           {options.map((option) => (

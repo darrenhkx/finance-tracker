@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from schemas.usersSchema import UserCreate, UserOut, UserLogin
-from services.usersService import create_user, login_user
+from services.usersService import create_user, login_user, get_goal
 from deps import get_db
 from models.models import User
-from middleware.auth import create_access_token
+from middleware.auth import create_access_token, get_current_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -28,3 +28,8 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         "email": db_user.email,
         "user_id": str(db_user.id)
     }
+
+@router.get("/goals")
+def get_user_goal(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    amount = get_goal(db, current_user.id)
+    return {"goal": amount}
