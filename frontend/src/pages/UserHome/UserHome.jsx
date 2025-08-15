@@ -3,14 +3,15 @@ import "./UserHome.css";
 import NavBar from "../../components/NavBar/NavBar.jsx";
 import Card from "../../components/Card/Card.jsx";
 import ExpenseBreakdown from "../../components/ExpenseBreakdown/ExpenseBreakdown.jsx";
-import MonthlyExpensesBar from "../../components/MonthlyExpensesBar/MonthlyExpensesBar.jsx";
+import DailySpending from "../../components/DailySpending/DailySpending.jsx";
 import BudgetProgress from "../../components/BudgetProgress/BudgetProgress.jsx";
 
 const UserHome = () => {
   const user_id = JSON.parse(localStorage.getItem("user"))?.user_id;
   const token = localStorage.getItem("token");
   const [income, setIncome] = useState(0);
-  const [expenses, setExpenses] = useState([]);
+  const [expensesByCat, setExpensesByCat] = useState([]);
+  const [rawExpenses, setRawExpenses] = useState([]);
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,6 +91,8 @@ const UserHome = () => {
 
         const data = await response.json();
         const data2 = await response2.json();
+        setTotalExpenses(data2.total);
+        setRawExpenses(data);
 
         // Convert into name, value pairs to be used for charts
         const categoryTotals = {};
@@ -107,8 +110,7 @@ const UserHome = () => {
           value,
         }));
         
-        setExpenses(formattedData);
-        setTotalExpenses(data2.total);
+        setExpensesByCat(formattedData);
       } catch (err) {
         console.error(err);
         setError("Failed to load expenses");
@@ -181,16 +183,11 @@ const UserHome = () => {
     if (user_id && token) fetchGoals();
   }, [user_id, token]);
 
-  const monthlyData = [ // hardcoded. to be removed.
-    { month: "Jun'25", budget: totalBudget, expenses: totalExpenses },
-    { month: "Jul'25", budget: totalBudget, expenses: totalExpenses },
-  ];
-
   const mergedBudgets = (() => {
       const matched = [];
 
       budgets.forEach(b => {
-        const expense = expenses.find(e => e.name === b.name);
+        const expense = expensesByCat.find(e => e.name === b.name);
         matched.push({
           name: b.name,
           budget: b.value,
@@ -232,10 +229,10 @@ const UserHome = () => {
           <div className="overview-section">
             <div className="graphs-container">
               <div className="expense-piechart-card">
-                <ExpenseBreakdown data={expenses} />
+                <ExpenseBreakdown data={expensesByCat} />
               </div>
-              <div className="expense-vs-budget-card">
-                <MonthlyExpensesBar data={monthlyData} />
+              <div className="daily-spending-card">
+                <DailySpending data={rawExpenses} year = {year} month = {month} />
               </div>
             </div>
             <div className="budget-progress-container">
