@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useRef, useMemo} from "react";
 import "./UserHome.css";
 import NavBar from "../../components/NavBar/NavBar.jsx";
 import Card from "../../components/Card/Card.jsx";
@@ -48,6 +48,9 @@ const UserHome = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortKey, setSortKey] = useState("date");      // default sort column
+  const [sortOrder, setSortOrder] = useState("desc");  // "asc" or "desc"
+  const [displayed, setDisplayed] = useState([]);
 
   useEffect(() => {
     const fetchIncome = async () => {
@@ -263,15 +266,16 @@ const UserHome = () => {
     console.log("Click");
   }
 
-  const filteredTransactions = transactions.filter(t => {
-    const matchesCategory = categoryFilter ? t.category === categoryFilter : true;
-    const matchesType = typeFilter ? t.type === typeFilter : true;
-    const matchesSearch = searchQuery
-      ? t.name.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-
-    return matchesCategory && matchesType && matchesSearch;
-  });
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(t => {
+      const matchesCategory = categoryFilter ? t.category === categoryFilter : true;
+      const matchesType = typeFilter ? t.type === typeFilter : true;
+      const matchesSearch = searchQuery
+        ? t.name.toLowerCase().includes(searchQuery.toLowerCase())
+        : true;
+      return matchesCategory && matchesType && matchesSearch;
+    });
+  }, [transactions, categoryFilter, typeFilter, searchQuery]);
 
   const filteredTotalIncome = filteredTransactions
   .filter(t => t.type === "Income")
@@ -287,6 +291,39 @@ const UserHome = () => {
     setTypeFilter("");
     console.log("Filters cleared")
   }
+
+  // keep displayed in sync when filters change
+  useEffect(() => {
+    setDisplayed(filteredTransactions);
+  }, [filteredTransactions]);
+
+  // small comparator used by handleSort
+  const compare = (a, b, key) => {
+    if (key === "date") return new Date(a.date) - new Date(b.date);
+    if (key === "amount") {
+      // treat expenses as negative for sorting
+      const aVal = a.type === "Expense" ? -a.amount : a.amount;
+      const bVal = b.type === "Expense" ? -b.amount : b.amount;
+      return aVal - bVal;
+    }
+    return String(a[key] ?? "").toLowerCase().localeCompare(String(b[key] ?? "").toLowerCase());
+  };
+
+  // minimal handleSort
+  const handleSort = (key) => {
+    // toggle order if same key, otherwise default to desc
+    const nextOrder = sortKey === key ? (sortOrder === "asc" ? "desc" : "asc") : "desc";
+    setSortKey(key);
+    setSortOrder(nextOrder);
+
+    // sort a copy of currently displayed items
+    const sorted = [...displayed].sort((x, y) => {
+      const cmp = compare(x, y, key);
+      return nextOrder === "asc" ? cmp : -cmp;
+    });
+
+    setDisplayed(sorted);
+  };
 
   return (
     <div className="user-home">
@@ -422,16 +459,16 @@ const UserHome = () => {
               <table className="tx-table">
                 <thead>
                   <tr>
-                    <th className="table-date">Date</th>
+                    <th className="table-date">Date<span className="sort-arrows" onClick={() => handleSort("date")}>↑↓</span></th>
                     <th className="table-name">Name</th>
-                    <th className="table-cat">Category</th>
-                    <th className="table-type">Type</th>
-                    <th className="table-amount">Amount</th>
+                    <th className="table-cat">Category<span className="sort-arrows" onClick={() => handleSort("category")}>↑↓</span></th>
+                    <th className="table-type">Type<span className="sort-arrows" onClick={() => handleSort("type")}>↑↓</span></th>
+                    <th className="table-amount">Amount<span className="sort-arrows" onClick={() => handleSort("amount")}>↑↓</span></th>
                     <th className="table-action">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTransactions.map(t => (
+                  {displayed.map(t => (
                     <tr key={t.id}>
                       <td className="table-date">{t.date}</td>
                       <td className="table-name">{t.name}</td>
