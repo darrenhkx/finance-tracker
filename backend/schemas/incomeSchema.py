@@ -4,14 +4,18 @@ from enum import Enum
 from datetime import datetime, date
 from uuid import UUID
 
-class getIncome(BaseModel):
+class IncomeOut(BaseModel):
     id: UUID
-    user_id: UUID
-    amount: float
     name: str
+    amount: float
     received_at: date
+    category_id: UUID | None = None
 
-# setIncome
+    class Config:
+        orm_mode = True
+
+class TotalOut(BaseModel):
+    total: float
 
 # updateIncome
 

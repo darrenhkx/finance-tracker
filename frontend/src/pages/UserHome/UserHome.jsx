@@ -1,14 +1,16 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import "./UserHome.css";
 import NavBar from "../../components/NavBar/NavBar.jsx";
 import Card from "../../components/Card/Card.jsx";
 import ExpenseBreakdown from "../../components/ExpenseBreakdown/ExpenseBreakdown.jsx";
 import DailySpending from "../../components/DailySpending/DailySpending.jsx";
 import BudgetProgress from "../../components/BudgetProgress/BudgetProgress.jsx";
+import filterLogo from "../../assets/filter.png";
 
 const UserHome = () => {
   const user_id = JSON.parse(localStorage.getItem("user"))?.user_id;
   const token = localStorage.getItem("token");
+  const [incomeList, setIncomeList] = useState([]);
   const [income, setIncome] = useState(0);
   const [expensesByCat, setExpensesByCat] = useState([]);
   const [rawExpenses, setRawExpenses] = useState([]);
@@ -26,19 +28,64 @@ const UserHome = () => {
   const savings = income-totalExpenses;
   const savingsPercentage = (savings/income*100).toFixed(1);
   const options = ["Overview", "Transactions", "History"];
+  const mergedBudgets = (() => {
+      const matched = [];
+
+      budgets.forEach(b => {
+        const expense = expensesByCat.find(e => e.name === b.name);
+        matched.push({
+          name: b.name,
+          budget: b.value,
+          spent: expense ? expense.value : 0,
+        });
+      });
+
+      return matched;
+    })();
+
+  const [selectedOption, setSelectedOption] = useState("Overview");
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     const fetchIncome = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/income/latest`, {
+        const response = await fetch(`http://127.0.0.1:8000/income/${year}/${month}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
         if (!response.ok) throw new Error("Failed to fetch income");
         
+        const response2 = await fetch(`http://127.0.0.1:8000/income/${year}/${month}/total`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        if (!response2.ok) throw new Error("Failed to fetch income total");
+        
         const data = await response.json();
-        setIncome(data.latest_income);
+        const totalIncome = await response2.json();
+        
+        setIncomeList(data);
+        setIncome(totalIncome.total);
+        
+        // for transactions
+        const mapped = data.map(i => ({
+          id: i.id,                  
+          date: i.received_at,  
+          name: i.name,
+          category: "",                    // incomes get empty category(for now)
+          type: "income",
+          amount: Number(i.amount),
+        }));
+
+        setTransactions(prev => {
+          const withoutOldIncome = prev.filter(t => t.type !== "income");
+          const merged = [...withoutOldIncome, ...mapped];
+          merged.sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
+          return merged;
+        });
+
       } catch (err) {
         console.error(err);
         setError("Failed to load income");
@@ -47,7 +94,7 @@ const UserHome = () => {
       }
     };
     if (user_id && token) fetchIncome();
-  }, [user_id, token]);
+  }, [user_id, token, year, month]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -119,7 +166,7 @@ const UserHome = () => {
       }
     };
     if (user_id && token) fetchExpenses();
-  }, [categories, user_id, token]);
+  }, [categories, user_id, token,year,month]);
 
   useEffect(() => {
     const fetchBudgets = async () => {
@@ -183,22 +230,13 @@ const UserHome = () => {
     if (user_id && token) fetchGoals();
   }, [user_id, token]);
 
-  const mergedBudgets = (() => {
-      const matched = [];
+  const inputRef = useRef(null);
 
-      budgets.forEach(b => {
-        const expense = expensesByCat.find(e => e.name === b.name);
-        matched.push({
-          name: b.name,
-          budget: b.value,
-          spent: expense ? expense.value : 0,
-        });
-      });
-
-      return matched;
-    })();
-
-  const [selectedOption, setSelectedOption] = useState("Overview");
+  const handleSearchContainerClick = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
   return (
     <div className="user-home">
@@ -281,7 +319,81 @@ const UserHome = () => {
         )}
         {selectedOption === "Transactions" && (
           <div className="transactions-section">
-            Transactions content...
+            <div className="header-container">
+              <h2>Transaction History</h2>
+              <p>View and manage all your transactions</p>
+            </div>
+            <div className="transaction-filters-container">
+              <div className="filter-header-container">
+                <img className="filter-logo" src={filterLogo} alt="filter icon" />
+                <p>Filters</p>
+              </div>
+              <div className="transaction-filters">
+                <div className="search-container" onClick={handleSearchContainerClick}>
+                  <span className="search-logo">⚲</span>
+                  <input ref={inputRef} type="text" placeholder="Search" className="filter-search" />
+                </div>
+                <select className="filter-dropdown">
+                  <option value="">All Categories</option>
+                  {categories.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                    ))}
+                  {/* replace with logic drawing from categories data */}
+                </select>
+
+                {/* Type dropdown */}
+                <select className="filter-dropdown">
+                  <option value="">All Types</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>  
+                </select>
+
+                {/* Clear filters button */}
+                <button className="filter-clear">Clear Filters</button>
+              </div>
+            </div>
+            <div className="transaction-cards-container">
+              <div className="transaction-cards">
+                <h2>12345</h2>
+                <p>Total Transactions</p>
+              </div>
+              <div className="transaction-cards">
+                <h2>12345</h2>
+                <p>Total Income</p>
+              </div>
+              <div className="transaction-cards">
+                <h2>12345</h2>
+                <p>Total Expenses</p>
+              </div>
+            </div>
+            <div className="transactions-list-container">
+              <p>Transactions</p>
+              <table className="tx-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map(t => (
+                    <tr key={t.id}>
+                      <td>{t.name}</td>
+                      <td>{/* map category_id -> name */}</td>
+                      <td>{t.type}</td>
+                      <td className="num">{t.amount}</td>
+                      <td>{/* format date */}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
         {selectedOption === "History" && (
