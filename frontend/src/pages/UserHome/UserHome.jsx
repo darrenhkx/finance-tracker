@@ -45,6 +45,9 @@ const UserHome = () => {
 
   const [selectedOption, setSelectedOption] = useState("Overview");
   const [transactions, setTransactions] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchIncome = async () => {
@@ -75,12 +78,12 @@ const UserHome = () => {
           date: i.received_at,  
           name: i.name,
           category: "",                    // incomes get empty category(for now)
-          type: "income",
+          type: "Income",
           amount: Number(i.amount),
         }));
 
         setTransactions(prev => {
-          const withoutOldIncome = prev.filter(t => t.type !== "income");
+          const withoutOldIncome = prev.filter(t => t.type !== "Income");
           const merged = [...withoutOldIncome, ...mapped];
           merged.sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
           return merged;
@@ -158,6 +161,24 @@ const UserHome = () => {
         }));
         
         setExpensesByCat(formattedData);
+
+        // for transactions
+        const mapped = data.map(i => ({
+          id: i.id,                  
+          date: i.date,  
+          name: i.name,
+          category: categories.find((cat) => cat.id === i.category_id)?.name,                    
+          type: "Expense",
+          amount: Number(i.amount),
+        }));
+
+        setTransactions(prev => {
+          const withoutOldIncome = prev.filter(t => t.type !== "Expense");
+          const merged = [...withoutOldIncome, ...mapped];
+          merged.sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
+          return merged;
+        });
+
       } catch (err) {
         console.error(err);
         setError("Failed to load expenses");
@@ -237,6 +258,35 @@ const UserHome = () => {
       inputRef.current.focus();
     }
   };
+
+  const handleDeleteTransaction = (id) => {
+    console.log("Click");
+  }
+
+  const filteredTransactions = transactions.filter(t => {
+    const matchesCategory = categoryFilter ? t.category === categoryFilter : true;
+    const matchesType = typeFilter ? t.type === typeFilter : true;
+    const matchesSearch = searchQuery
+      ? t.name.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+
+    return matchesCategory && matchesType && matchesSearch;
+  });
+
+  const filteredTotalIncome = filteredTransactions
+  .filter(t => t.type === "Income")
+  .reduce((sum, t) => sum + Number(t.amount), 0);
+
+  const filteredTotalExpenses = filteredTransactions
+    .filter(t => t.type === "Expense")
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+  
+  const handleClearFilter = () => {
+    setSearchQuery("");
+    setCategoryFilter("");
+    setTypeFilter("");
+    console.log("Filters cleared")
+  }
 
   return (
     <div className="user-home">
@@ -331,64 +381,66 @@ const UserHome = () => {
               <div className="transaction-filters">
                 <div className="search-container" onClick={handleSearchContainerClick}>
                   <span className="search-logo">⚲</span>
-                  <input ref={inputRef} type="text" placeholder="Search" className="filter-search" />
+                  <input ref={inputRef} type="text" placeholder="Search" className="filter-search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
                 </div>
-                <select className="filter-dropdown">
+                <select className="filter-dropdown" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                   <option value="">All Categories</option>
                   {categories.map((item) => (
-                    <option key={item.id} value={item.id}>
+                    <option key={item.id} value={item.name}>
                       {item.name}
                     </option>
                     ))}
-                  {/* replace with logic drawing from categories data */}
                 </select>
 
                 {/* Type dropdown */}
-                <select className="filter-dropdown">
+                <select className="filter-dropdown" value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
                   <option value="">All Types</option>
-                  <option value="income">Income</option>
-                  <option value="expense">Expense</option>  
+                  <option value="Income">Income</option>
+                  <option value="Expense">Expense</option>  
                 </select>
 
                 {/* Clear filters button */}
-                <button className="filter-clear">Clear Filters</button>
+                <button className="filter-clear" onClick={handleClearFilter}>Clear Filters</button>
               </div>
             </div>
             <div className="transaction-cards-container">
               <div className="transaction-cards">
-                <h2>12345</h2>
+                <h2>{filteredTransactions.length}</h2>
                 <p>Total Transactions</p>
               </div>
               <div className="transaction-cards">
-                <h2>12345</h2>
+                <h2 className="filter-income">${filteredTotalIncome}</h2>
                 <p>Total Income</p>
               </div>
               <div className="transaction-cards">
-                <h2>12345</h2>
+                <h2 className="filter-expenses">${filteredTotalExpenses}</h2>
                 <p>Total Expenses</p>
               </div>
             </div>
             <div className="transactions-list-container">
-              <p>Transactions</p>
+              <h3>Transactions</h3>
               <table className="tx-table">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Actions</th>
+                    <th className="table-date">Date</th>
+                    <th className="table-name">Name</th>
+                    <th className="table-cat">Category</th>
+                    <th className="table-type">Type</th>
+                    <th className="table-amount">Amount</th>
+                    <th className="table-action">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.map(t => (
+                  {filteredTransactions.map(t => (
                     <tr key={t.id}>
-                      <td>{t.name}</td>
-                      <td>{/* map category_id -> name */}</td>
-                      <td>{t.type}</td>
-                      <td className="num">{t.amount}</td>
-                      <td>{/* format date */}</td>
+                      <td className="table-date">{t.date}</td>
+                      <td className="table-name">{t.name}</td>
+                      <td className="table-cat">{t.category}</td>
+                      <td className="table-type">{t.type}</td>
+                      <td className={t.type === "Expense" ? "td-amount-expense" : "td-amount-income"}>
+                        {t.type === "Expense" ? `-$${t.amount}` : `+$${t.amount}`}
+                      </td>
+                      <td className="table-action"><span onClick={() => handleDeleteTransaction(t.id)}>🗑</span></td>
                     </tr>
                   ))}
                 </tbody>

@@ -297,6 +297,7 @@
 .transaction-cards-container {
   display:flex;
   gap: 20px;
+  margin-bottom: 1.2rem;
 }
 
 .transaction-cards {
@@ -312,6 +313,87 @@
   color: rgb(99, 99, 99);
   margin-top: 0;
 }
+
+.filter-income {
+  color: green;
+}
+
+.filter-expenses {
+  color: rgb(212, 47, 47);
+}
+
+.transactions-list-container {
+  border-radius: 12px;
+  background-color: rgb(248, 234, 234);
+  padding: 0 20px 20px 20px;
+  border: 0.1px solid grey;
+}
+
+.transactions-list-container h3{
+  text-align: left;
+  padding-left: 5px;
+}
+
+.tx-table {
+  width:100%;
+  border-collapse: collapse;
+}
+
+.tx-table th {
+  padding: 10px;
+  background-color: rgb(248, 234, 234);
+  text-align: left;
+}
+
+.tx-table td {
+  padding: 5px 10px 5px 10px;
+}
+
+.tx-table tr:nth-child(odd) {
+  background-color: rgb(233, 220, 222);
+}
+
+.table-date {
+  width:10%;
+}
+
+.table-name {
+  width: 35%
+}
+
+.table-category {
+  width: 20%;
+}
+
+.table-type {
+  width: 10%;
+}
+
+.td-amount-expense {
+  width: 15%;
+  text-align: right;
+  color: rgb(212, 47, 47);
+}
+
+.td-amount-income {
+  width: 15%;
+  text-align: right;
+  color: green;
+}
+
+.table-amount {
+  text-align: right !important;
+}
+
+.table-action {
+  width: 10%;
+  text-align: center !important;
+}
+
+.table-action span{
+  cursor:pointer;
+}
+
 /*#################################################################################################################*/
 .history-section {
     min-height: 50vh;
